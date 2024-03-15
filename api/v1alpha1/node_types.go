@@ -29,10 +29,12 @@ type NodeConfigSpec struct {
 	AWS *AWSNodeSpec `json:"aws,omitempty"`
 	// +optional
 	Docker *DockerNodeSpec `json:"docker,omitempty"`
+
+	GenericNodeSpec `json:",inline"`
 }
 
 func (s NodeConfigSpec) VariableSchema() clusterv1.VariableSchema {
-	nodeConfigProps := GenericNodeConfig{}.VariableSchema()
+	nodeConfigProps := GenericNodeSpec{}.VariableSchema()
 
 	switch {
 	case s.AWS != nil:
@@ -54,9 +56,9 @@ func (s NodeConfigSpec) VariableSchema() clusterv1.VariableSchema {
 	return nodeConfigProps
 }
 
-type GenericNodeConfig struct{}
+type GenericNodeSpec struct{}
 
-func (GenericNodeConfig) VariableSchema() clusterv1.VariableSchema {
+func (GenericNodeSpec) VariableSchema() clusterv1.VariableSchema {
 	return clusterv1.VariableSchema{
 		OpenAPIV3Schema: clusterv1.JSONSchemaProps{
 			Description: "Node configuration",
