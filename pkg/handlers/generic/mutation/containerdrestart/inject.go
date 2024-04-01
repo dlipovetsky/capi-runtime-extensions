@@ -17,13 +17,13 @@ import (
 	"github.com/d2iq-labs/cluster-api-runtime-extensions-nutanix/common/pkg/capi/clustertopology/patches/selectors"
 )
 
-type globalMirrorPatchHandler struct{}
+type containerdRestartPatchHandler struct{}
 
-func NewPatch() *globalMirrorPatchHandler {
-	return &globalMirrorPatchHandler{}
+func NewPatch() *containerdRestartPatchHandler {
+	return &containerdRestartPatchHandler{}
 }
 
-func (h *globalMirrorPatchHandler) Mutate(
+func (h *containerdRestartPatchHandler) Mutate(
 	ctx context.Context,
 	obj *unstructured.Unstructured,
 	vars map[string]apiextensionsv1.JSON,

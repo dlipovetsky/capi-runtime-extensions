@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/onsi/gomega"
+	runtimehooksv1 "sigs.k8s.io/cluster-api/exp/runtime/hooks/api/v1alpha1"
 
 	"github.com/d2iq-labs/cluster-api-runtime-extensions-nutanix/common/pkg/capi/clustertopology/handlers/mutation"
 	"github.com/d2iq-labs/cluster-api-runtime-extensions-nutanix/common/pkg/testutils/capitest"
@@ -46,12 +47,22 @@ func TestGeneratePatches(
 			},
 		},
 		capitest.PatchTestDef{
-			Name:        "restart script and command added to worker node kubeadm config template",
-			RequestItem: request.NewKubeadmControlPlaneTemplateRequestItem(""),
+			Name: "restart script and command added to worker node kubeadm config template",
+			Vars: []runtimehooksv1.Variable{
+				capitest.VariableWithValue(
+					"builtin",
+					map[string]any{
+						"machineDeployment": map[string]any{
+							"class": "*",
+						},
+					},
+				),
+			},
+			RequestItem: request.NewKubeadmConfigTemplateRequestItem(""),
 			ExpectedPatchMatchers: []capitest.JSONPatchMatcher{
 				{
 					Operation: "add",
-					Path:      "/spec/template/spec/kubeadmConfigSpec/files",
+					Path:      "/spec/template/spec/files",
 					ValueMatcher: gomega.ContainElements(
 						gomega.HaveKeyWithValue(
 							"path", containerdrestart.ContainerdRestartScriptOnRemote,
@@ -60,7 +71,7 @@ func TestGeneratePatches(
 				},
 				{
 					Operation: "add",
-					Path:      "/spec/template/spec/kubeadmConfigSpec/preKubeadmCommands",
+					Path:      "/spec/template/spec/preKubeadmCommands",
 					ValueMatcher: gomega.ContainElements(
 						containerdrestart.ContainerdRestartScriptOnRemoteCommand,
 					),
