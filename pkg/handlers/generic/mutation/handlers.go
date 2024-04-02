@@ -35,6 +35,10 @@ func MetaMutators(mgr manager.Manager) []mutation.MetaMutator {
 		// Some patches may have changed containerd configuration.
 		// We must restart containerd for the configuration to take effect.
 		// Therefore, we must apply this patch last.
+		//
+		// Containerd restart and readiness altogether could take ~5s.
+		// We want to keep patch independent of each other and not share any state.
+		// Therefore, We must always apply this patch regardless any other patch modified containerd configuration.
 		containerdrestart.NewPatch(),
 	}
 }
