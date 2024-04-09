@@ -15,12 +15,12 @@ import (
 	"github.com/d2iq-labs/cluster-api-runtime-extensions-nutanix/common/pkg/testutils/capitest/request"
 )
 
-func TestContainerdRestartPatch(t *testing.T) {
+func TestContainerdMetricsPatch(t *testing.T) {
 	gomega.RegisterFailHandler(Fail)
-	RunSpecs(t, "Containerd restart mutator suite")
+	RunSpecs(t, "Containerd metrics mutator suite")
 }
 
-var _ = Describe("Generate Containerd restart patches", func() {
+var _ = Describe("Generate containerd metrics patches", func() {
 	// only add aws region patch
 	patchGenerator := func() mutation.GeneratePatches {
 		return mutation.NewMetaGeneratePatchesHandler("", NewPatch()).(mutation.GeneratePatches)
