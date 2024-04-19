@@ -14,6 +14,7 @@ import (
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 
 	"github.com/nutanix-cloud-native/cluster-api-runtime-extensions-nutanix/api/openapi/patterns"
+	"github.com/nutanix-cloud-native/cluster-api-runtime-extensions-nutanix/api/variables"
 )
 
 type StorageProvisioner string
@@ -29,6 +30,8 @@ const (
 
 	CCMProviderAWS     = "aws"
 	CCMProviderNutanix = "nutanix"
+
+	EncryptionProviderAESCBC = "aescbc"
 )
 
 var (
@@ -142,6 +145,9 @@ type GenericClusterConfig struct {
 
 	// +optional
 	Users Users `json:"users,omitempty"`
+
+	// +optional
+	Encryption Encryption `json:"encryption,omitempty"`
 }
 
 func (s GenericClusterConfig) VariableSchema() clusterv1.VariableSchema { //nolint:gocritic,lll // Passed by value for no potential side-effect.
@@ -467,6 +473,30 @@ func (User) VariableSchema() clusterv1.VariableSchema {
 					// a sudo rule parser, so we do not validate the input.
 				},
 			},
+		},
+	}
+}
+
+// Encryption describes the API server at-rest encryption configuration.
+// See https://kubernetes.io/docs/tasks/administer-cluster/encrypt-data/
+type Encryption struct {
+	Provider string
+}
+
+func (Encryption) VariableSchema() clusterv1.VariableSchema {
+	supportedProviders := []string{EncryptionProviderAESCBC}
+
+	return clusterv1.VariableSchema{
+		OpenAPIV3Schema: clusterv1.JSONSchemaProps{
+			Type: "object",
+			Properties: map[string]clusterv1.JSONSchemaProps{
+				"provider": {
+					Description: "API server encryption provider",
+					Type:        "string",
+					Enum:        variables.MustMarshalValuesToEnumJSON(supportedProviders...),
+				},
+			},
+			Required: []string{"provider"},
 		},
 	}
 }
