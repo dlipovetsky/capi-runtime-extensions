@@ -9,6 +9,7 @@ import (
 	"slices"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/utils/ptr"
 	clusterv1 "sigs.k8s.io/cluster-api/api/v1beta1"
 	bootstrapv1 "sigs.k8s.io/cluster-api/bootstrap/kubeadm/api/v1beta1"
@@ -215,4 +216,17 @@ func clusterResourceSetBindingIsOnlyOwnedByClusterResourceSets(
 	gotOwners []metav1.OwnerReference,
 ) error {
 	return framework.HasExactOwners(dedupeOwners(gotOwners), clusterResourceSetOwner)
+}
+
+// FilterClusterObjectsWithClusterNameLabelFilter is used by e2e tests to filter out resources that are in
+// the clusterctl owner graph, but that may be shared by multiple clusters. Resources that are unique to one
+// cluster are labeled; if a resource does not have the label, or the label value does not match the cluster name,
+// then the resource is not unique to that cluster.
+func FilterClusterObjectsWithClusterNameLabelFilter(clusterName string) func(u unstructured.Unstructured) bool {
+	return func(u unstructured.Unstructured) bool {
+		if labels := u.GetLabels(); labels != nil {
+			return labels[clusterv1.ClusterNameLabel] == clusterName
+		}
+		return false
+	}
 }

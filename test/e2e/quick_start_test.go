@@ -13,7 +13,6 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"k8s.io/utils/ptr"
-	clusterctlcluster "sigs.k8s.io/cluster-api/cmd/clusterctl/client/cluster"
 	capie2e "sigs.k8s.io/cluster-api/test/e2e"
 	"sigs.k8s.io/cluster-api/test/framework"
 
@@ -86,9 +85,7 @@ var _ = Describe("Quick start", Serial, func() {
 									framework.AssertOwnerReferences(
 										namespace,
 										proxy.GetKubeconfigPath(),
-										clusterctlcluster.FilterClusterObjectsWithNameFilter(
-											clusterName,
-										),
+										FilterClusterObjectsWithClusterNameLabelFilter(clusterName),
 										framework.CoreOwnerReferenceAssertion,
 										framework.DockerInfraOwnerReferenceAssertions,
 										framework.KubeadmBootstrapOwnerReferenceAssertions,
